@@ -20,7 +20,7 @@ def get_data():
             elif header == 'Style':
                 style_index = index
 
-        # get dates, grades and style for all routes from the file
+        # get dates, grades and style for all routes from the file & clean data
         data = []
         for row in reader:
             date = datetime.strptime(row[date_index][3:], '%b/%y')
@@ -40,14 +40,18 @@ def categorise_climbs(data):
         climb = data.pop()
         grade = climb[1]
         style = climb[2] 
-        if grade[0] in numbers and style[0:4] == 'Lead':
+        if grade[0] in numbers and (
+            (style[0:4] == 'Lead' and style[0:6] != 'Lead d') or (
+                style[0:5] == 'AltLd' and style[0:7] != 'AltLd d')):
             sport.append(climb)
-        elif grade[0] in letters and style[0:4] == 'Lead':
+        elif grade[0] in letters and (
+            (style[0:4] == 'Lead' and style[0:6] != 'Lead d') or (
+                style[0:5] == 'AltLd' and style[0:7] != 'AltLd d')):
             trad.append(climb)
-        elif grade[0] == 'f':
-            boulder.append(climb)
-        else:
-            others.append(climb)
+        # elif grade[0] == 'f':
+        #     boulder.append(climb)
+        # else:
+        #     others.append(climb)
     return sport, trad
 
 def rationalise_trad_grades(climbs):
@@ -88,9 +92,9 @@ def rationalise_trad_grades(climbs):
             climbs[index][1] = 'E10'
     return climbs
 
-def find_dates_grades(subtable):
+def find_dates_grades(climb_list):
     '''find out what the dates and grades are for sport climbs'''
-    climbs = subtable[:]
+    climbs = climb_list[:]
     grades, dates = [], []
     count = 0
     for climb in range(0, len(climbs)):
@@ -102,6 +106,11 @@ def find_dates_grades(subtable):
     grade_set = sorted(set(grades))
     date_set = sorted(set(dates))
     return date_set, grade_set
+
+def combine_dates(sport_dates, trad_dates):
+    all_dates = sport_dates + trad_dates
+    dates = sorted(set(all_dates))
+    return dates
 
 def build_summary_dict(dates, grades, climbs):
     '''create a dictionary of lists, each filled with number of climbs climbed 
@@ -148,13 +157,10 @@ sport, trad = categorise_climbs(data)
 r_trad = rationalise_trad_grades(trad)
 s_dates, s_grades = find_dates_grades(sport)
 t_dates, t_grades = find_dates_grades(r_trad)
-
-all_dates = s_dates + t_dates
-dates = sorted(set(all_dates))
-
+dates = combine_dates(s_dates, t_dates)
 s_grade_dict = build_summary_dict(dates, s_grades, sport)
-t_grade_dic = build_summary_dict(dates, trad_grade_order, r_trad)
-t_grade_dict = rationalise_summary_dict(t_grade_dic)
+t_grade_dict_temp = build_summary_dict(dates, trad_grade_order, r_trad)
+t_grade_dict = rationalise_summary_dict(t_grade_dict_temp)
 
 # visualise climbs
 fig = make_subplots(rows=2, cols=1)
@@ -169,6 +175,6 @@ for key in s_grade_dict:
 for key in t_grade_dict:
     fig.add_trace(go.Bar(x=x, y=t_grade_dict[key], name=key), row=1, col=1)
 
-fig.update_layout(barmode='stack', title_text='Trad and Sport Routes')
+fig.update_layout(barmode='stack', title_text='Clean Trad and Sport Leads')
 
 fig.show()
