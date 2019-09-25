@@ -15,6 +15,13 @@ class BuildData:
         self.data, self.sport, self.trad, self.dates  = [], [], [], []
         self.s_grade_dict, self.t_grade_dict = {}, {}
 
+    def run_program(self):
+        self.get_data()
+        self.categorise_climbs()
+        self.rationalise_trad_grades()
+        self.build_visuals()
+        self.visualise_climbs()
+
     def get_data(self):
         '''open the logbook file and set variables based on file structure'''
         with open(self.filename) as f:
