@@ -1,5 +1,5 @@
 # UKC_Logbook
-A Python programs to visualise lead climbs, with data having been downloaded from individual UKC climbing logbook in csv format.
+A couple of Python programs to visualise lead climbs, with data having been downloaded from individual UKC climbing logbook in csv format.
 
 The programs do the same thing, they're just structured differently.  
 
