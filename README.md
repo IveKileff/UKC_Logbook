@@ -12,3 +12,4 @@ Depending on which program you're using:
   - to save your UKC logbook as "ukc_logbook.csv" in the same directory as "logbook_5.py" and "logbook_5_build_data.py"
   - to save your UKC logbook as "ukc_logbook.csv" in the same directory as "logbook_lead.py"
     
+18 Oct 21: Added a new version (which is still being worked on), which also needs plotly express and pandas installed.
